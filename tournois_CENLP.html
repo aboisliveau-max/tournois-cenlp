@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les tournois du CENLP 🤺</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-gradient: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        header {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+        }
+        .tabs {
+            display: flex;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 0 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--muted);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px 3px 0 0;
+        }
+        .content {
+            flex: 1;
+            padding: 20px 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        h2 { 
+            font-size: 1.1rem; 
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            color: var(--primary); 
+            font-weight: 600;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            width: 100%;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        button.btn {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        button.btn:active { 
+            transform: scale(0.99); 
+            opacity: 0.9;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+        .config-row label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--muted);
+            min-width: 180px;
+        }
+        .config-row input {
+            margin-bottom: 0 !important;
+        }
+
+        /* Grille de poule épurée */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+        table.fencing-pool {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            background: white;
+        }
+        table.fencing-pool th, table.fencing-pool td {
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+            text-align: center;
+        }
+        table.fencing-pool th {
+            background: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .fighter-col-header {
+            text-align: left !important;
+            min-width: 160px;
+            background: #f8fafc !important;
+            color: var(--primary) !important;
+            font-weight: 500;
+        }
+        .pool-input-cell {
+            width: 42px;
+            height: 38px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            background: #ffffff;
+        }
+        .pool-input-cell:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+        .cell-win {
+            background-color: #f0fdf4 !important;
+            color: #15803d;
+            border-color: #bbf7d0 !important;
+        }
+        .cell-loss {
+            background-color: #fef2f2 !important;
+            color: #b91c1c;
+            border-color: #fecaca !important;
+        }
+        .cell-disabled {
+            background-color: #f1f5f9 !important;
+            border-color: var(--border) !important;
+        }
+        .stat-col {
+            font-weight: 600;
+            background: #f8fafc;
+            color: var(--primary);
+        }
+
+        /* Tableau final horizontal avec défilement horizontal */
+        .bracket-horizontal-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: #f8fafc;
+            padding: 20px 15px;
+            box-sizing: border-box;
+        }
+        .bracket-horizontal-container {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            min-width: max-content;
+        }
+        .bracket-round-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 240px;
+            gap: 15px;
+        }
+        .bracket-round-header {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .bracket-match-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .bracket-fighter-row {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #ffffff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            transition: all 0.2s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .bracket-fighter-row:hover {
+            border-color: var(--accent);
+            background: #f8fafc;
+        }
+        .bracket-fighter-row.winner {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #bbf7d0;
+        }
+
+        /* Classement général avant tableau */
+        .general-ranking-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .ranking-table th, .ranking-table td {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .ranking-table th {
+            background: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Chrono & Score */
+        .chrono-container {
+            text-align: center;
+        }
+        .timer-inputs-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .timer-box-input {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            width: 85px;
+            height: 65px;
+            text-align: center;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--primary);
+            padding: 0;
+        }
+        .timer-box-input:focus {
+            border-color: var(--accent);
+            background: #ffffff;
+            outline: none;
+        }
+        .timer-separator {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-top: -6px;
+        }
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .timer-controls button {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-start { background: #16a34a; }
+        .btn-stop { background: #dc2626; }
+        .btn-reset { background: var(--muted); }
+        
+        .scoreboards {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .score-box {
+            flex: 1;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+        }
+        .score-val {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--accent);
+        }
+        .score-btns {
+            display: flex;
+            gap: 10px;
+        }
+        .score-btns button {
+            flex: 1;
+            font-size: 1.4rem;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .score-btns button:active { opacity: 0.85; }
+        
+        ul#fightersList {
+            list-style: none;
+            padding: 0;
+            margin: 12px 0 0 0;
+        }
+        ul#fightersList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <header>Les tournois du CENLP 🤺</header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tournoi')">Tournoi</button>
+        <button class="tab-btn" onclick="switchTab('chrono')">Chrono & Scores</button>
+    </div>
+
+    <div class="content">
+        <!-- ONGLET TOURNOI -->
+        <div id="tournoi" class="tab-pane active">
+            <div class="card">
+                <h2>1. Participants & Configuration</h2>
+                <div class="config-row">
+                    <label for="maxPerPool">Tireurs max / poule :</label>
+                    <input type="number" id="maxPerPool" value="7" min="3" max="15">
+                </div>
+                <input type="text" id="fighterName" placeholder="Nom du tireur" onkeypress="checkEnter(event)">
+                <button class="btn" onclick="addFighter()">Ajouter</button>
+                <ul id="fightersList"></ul>
+                <button class="btn" style="margin-top:14px;" onclick="generatePools()">Générer les poules</button>
+            </div>
+
+            <div class="card" id="poolsSection" style="display:none;">
+                <h2>2. Poules</h2>
+                <div id="poolsContainer"></div>
+                <button class="btn" style="margin-top:16px;" onclick="validatePoolsAndShowRanking()">Valider les poules & Voir le classement</button>
+            </div>
+
+            <div class="card" id="rankingSection" style="display:none;">
+                <h2>3. Classement Général des Poules</h2>
+                <div class="general-ranking-box" id="generalRankingContainer"></div>
+                <button class="btn" onclick="generateBracketFromRanking()">Générer le tableau final</button>
+            </div>
+
+            <div class="card" id="tableauSection" style="display:none;">
+                <h2>4. Tableau d'élimination directe</h2>
+                <div class="bracket-horizontal-wrapper">
+                    <div class="bracket-horizontal-container" id="tableauContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET CHRONO & SCORE -->
+        <div id="chrono" class="tab-pane">
+            <div class="card chrono-container">
+                <h2>Chronomètre</h2>
+                <div class="timer-inputs-row">
+                    <input type="number" id="inputMin" class="timer-box-input" value="3" min="0" max="15">
+                    <span class="timer-separator">:</span>
+                    <input type="number" id="inputSec" class="timer-box-input" value="0" min="0" max="59">
+                </div>
+                <div class="timer-controls">
+                    <button class="btn-start" onclick="startTimer()">Start</button>
+                    <button class="btn-stop" onclick="stopTimer()">Stop</button>
+                    <button class="btn-reset" onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
+
+            <div class="scoreboards">
+                <div class="score-box">
+                    <input type="text" id="nameR" value="Rouge" style="text-align:center; font-weight:600; margin-bottom:8px;">
+                    <div class="score-val" id="scoreR">0</div>
+                    <div class="score-btns">
+                        <button onclick="modifyScore('R', -1)">-</button>
+                        <button onclick="modifyScore('R', 1)">+</button>
+                    </div>
+                </div>
+                <div class="score-box">
+                    <input type="text" id="nameV" value="Vert" style="text-align:center; font-weight:600; margin-bottom:8px;">
+                    <div class="score-val" id="scoreV">0</div>
+                    <div class="score-btns">
+                        <button onclick="modifyScore('V', -1)">-</button>
+                        <button onclick="modifyScore('V', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" style="background:#64748b; margin-top:16px;" onclick="resetScores()">Remettre les scores à zéro</button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        let fighters = [];
+        let pools = []; 
+        let globalRankings = [];
+
+        function checkEnter(e) {
+            if (e.key === 'Enter') addFighter();
+        }
+
+        function addFighter() {
+            const input = document.getElementById('fighterName');
+            const name = input.value.trim();
+            if(name && fighters.length < 64) {
+                fighters.push(name);
+                input.value = '';
+                updateFightersList();
+            }
+        }
+
+        function updateFightersList() {
+            const list = document.getElementById('fightersList');
+            list.innerHTML = fighters.map((f, i) => `<li>${f} <button onclick="removeFighter(${i})" style="color:#ef4444; border:none; background:none; cursor:pointer; font-weight:bold; font-size:1.1rem;">×</button></li>`).join('');
+        }
+
+        function removeFighter(index) {
+            fighters.splice(index, 1);
+            updateFightersList();
+        }
+
+        function generatePools() {
+            if(fighters.length < 2) {
+                alert("Il faut au moins 2 tireurs !");
+                return;
+            }
+            let maxPerPool = parseInt(document.getElementById('maxPerPool').value) || 7;
+            
+            pools = [];
+            let numPools = Math.ceil(fighters.length / maxPerPool);
+            
+            for(let p = 0; p < numPools; p++) {
+                pools.push({
+                    fighters: [],
+                    scores: []
+                });
+            }
+
+            fighters.forEach((f, idx) => {
+                let poolIdx = idx % numPools;
+                pools[poolIdx].fighters.push(f);
+            });
+
+            pools.forEach(pool => {
+                let size = pool.fighters.length;
+                pool.scores = Array(size).fill(0).map(() => Array(size).fill(''));
+            });
+
+            renderPoolsUI();
+            document.getElementById('poolsSection').style.display = 'block';
+            document.getElementById('rankingSection').style.display = 'none';
+            document.getElementById('tableauSection').style.display = 'none';
+        }
+
+        function renderPoolsUI() {
+            let container = document.getElementById('poolsContainer');
+            container.innerHTML = '';
+
+            pools.forEach((pool, pIdx) => {
+                let n = pool.fighters.length;
+                let poolDiv = document.createElement('div');
+                poolDiv.innerHTML = `<h3 style="font-size:1rem; color:var(--primary); margin-top:15px; margin-bottom:5px;">Poule ${pIdx + 1}</h3>`;
+                
+                let tableDiv = document.createElement('div');
+                tableDiv.className = 'table-responsive';
+
+                let html = `<table class="fencing-pool"><tr><th></th><th class="fighter-col-header">Tireur</th>`;
+                for (let j = 0; j < n; j++) {
+                    html += `<th>${j+1}</th>`;
+                }
+                html += `<th>V</th><th>Ind</th><th>Rg</th></tr>`;
+
+                for (let i = 0; i < n; i++) {
+                    html += `<tr>`;
+                    html += `<td style="font-weight:600; background:#f8fafc;">${i+1}</td>`;
+                    html += `<td class="fighter-col-header"><b>${pool.fighters[i]}</b></td>`;
+
+                    for (let j = 0; j < n; j++) {
+                        if (i === j) {
+                            html += `<td><div class="pool-input-cell cell-disabled"></div></td>`;
+                        } else {
+                            let val = pool.scores[i][j] !== undefined ? pool.scores[i][j] : '';
+                            html += `<td><input type="number" pattern="[0-9]*" min="0" max="30" class="pool-input-cell" value="${val}" id="pool_${pIdx}_cell_${i}__${j}" oninput="onPoolScoreInput(${pIdx}, ${i}, ${j})"></td>`;
+                        }
+                    }
+                    html += `<td class="stat-col" id="pool_${pIdx}_stat_v_${i}">0</td>`;
+                    html += `<td class="stat-col" id="pool_${pIdx}_stat_ind_${i}">0</td>`;
+                    html += `<td class="stat-col" id="pool_${pIdx}_stat_rg_${i}" style="color:var(--accent);">-</td>`;
+                    html += `</tr>`;
+                }
+                html += `</table>`;
+                tableDiv.innerHTML = html;
+                poolDiv.appendChild(tableDiv);
+                container.appendChild(poolDiv);
+            });
+
+            updatePoolsStatsAndColors();
+        }
+
+        function onPoolScoreInput(pIdx, i, j) {
+            let val = document.getElementById(`pool_${pIdx}_cell_${i}__${j}`).value;
+            pools[pIdx].scores[i][j] = val;
+            updatePoolsStatsAndColors();
+        }
+
+        function updatePoolsStatsAndColors() {
+            pools.forEach((pool, pIdx) => {
+                let n = pool.fighters.length;
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < n; j++) {
+                        if (i === j) continue;
+                        let cell = document.getElementById(`pool_${pIdx}_cell_${i}__${j}`);
+                        if (!cell) continue;
+                        let vI = parseInt(pool.scores[i][j]);
+                        let vJ = parseInt(pool.scores[j][i]);
+                        cell.className = "pool-input-cell";
+                        if (!isNaN(vI) && !isNaN(vJ)) {
+                            if (vI > vJ) cell.classList.add('cell-win');
+                            else if (vI < vJ) cell.classList.add('cell-loss');
+                        }
+                    }
+                }
+
+                let stats = pool.fighters.map((name, idx) => ({name, idx, v: 0, matches: 0, ts: 0, tr: 0}));
+                for (let i = 0; i < n; i++) {
+                    let v = 0, ts = 0, tr = 0, matches = 0;
+                    for (let j = 0; j < n; j++) {
+                        if (i === j) continue;
+                        let sI = parseInt(pool.scores[i][j]);
+                        let sJ = parseInt(pool.scores[j][i]);
+                        if (!isNaN(sI)) ts += sI;
+                        if (!isNaN(sJ)) tr += sJ;
+                        if (!isNaN(sI) && !isNaN(sJ)) {
+                            matches++;
+                            if (sI > sJ) v++;
+                        }
+                    }
+                    stats[i].v = v;
+                    stats[i].matches = matches;
+                    stats[i].ts = ts;
+                    stats[i].tr = tr;
+                    stats[i].indice = ts - tr;
+                }
+
+                stats.sort((a, b) => {
+                    let vm_a = a.matches > 0 ? a.v / a.matches : 0;
+                    let vm_b = b.matches > 0 ? b.v / b.matches : 0;
+                    if(vm_b !== vm_a) return vm_b - vm_a;
+                    if(b.indice !== a.indice) return b.indice - a.indice;
+                    return b.ts - a.ts;
+                });
+
+                stats.forEach((st, rIdx) => {
+                    let orig = st.idx;
+                    let vEl = document.getElementById(`pool_${pIdx}_stat_v_${orig}`);
+                    let indEl = document.getElementById(`pool_${pIdx}_stat_ind_${orig}`);
+                    let rgEl = document.getElementById(`pool_${pIdx}_stat_rg_${orig}`);
+                    if (vEl) vEl.innerText = st.v;
+                    if (indEl) indEl.innerText = (st.indice >= 0 ? '+' : '') + st.indice;
+                    if (rgEl) rgEl.innerText = rIdx + 1;
+                });
+            });
+        }
+
+        function validatePoolsAndShowRanking() {
+            computeGlobalRanking();
+            renderGlobalRankingUI();
+            document.getElementById('rankingSection').style.display = 'block';
+            document.getElementById('rankingSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function computeGlobalRanking() {
+            let allStats = [];
+
+            pools.forEach((pool) => {
+                let n = pool.fighters.length;
+                for (let i = 0; i < n; i++) {
+                    let v = 0, matches = 0, ts = 0, tr = 0;
+                    for (let j = 0; j < n; j++) {
+                        if (i === j) continue;
+                        let sI = parseInt(pool.scores[i][j]);
+                        let sJ = parseInt(pool.scores[j][i]);
+                        if (!isNaN(sI)) ts += sI;
+                        if (!isNaN(sJ)) tr += sJ;
+                        if (!isNaN(sI) && !isNaN(sJ)) {
+                            matches++;
+                            if (sI > sJ) v++;
+                        }
+                    }
+                    let vm = matches > 0 ? v / matches : 0;
+                    let indice = ts - tr;
+                    allStats.push({
+                        name: pool.fighters[i],
+                        v: v,
+                        matches: matches,
+                        vm: vm,
+                        ts: ts,
+                        tr: tr,
+                        indice: indice
+                    });
+                }
+            });
+
+            allStats.sort((a, b) => {
+                if (b.vm !== a.vm) return b.vm - a.vm;
+                if (b.indice !== a.indice) return b.indice - a.indice;
+                return b.ts - a.ts;
+            });
+
+            globalRankings = allStats;
+        }
+
+        function renderGlobalRankingUI() {
+            let container = document.getElementById('generalRankingContainer');
+            let html = `<table class="ranking-table"><tr><th>Rang</th><th>Tireur</th><th>V/M</th><th>Indice</th><th>TS</th></tr>`;
+            globalRankings.forEach((r, idx) => {
+                html += `<tr>
+                    <td style="font-weight:700; color:var(--accent);">${idx + 1}</td>
+                    <td style="font-weight:600; text-align:left;">${r.name}</td>
+                    <td>${r.matches > 0 ? (r.v / r.matches).toFixed(2) : '0.00'} (${r.v}/${r.matches})</td>
+                    <td>${(r.indice >= 0 ? '+' : '') + r.indice}</td>
+                    <td>${r.ts}</td>
+                </tr>`;
+            });
+            html += `</table>`;
+            container.innerHTML = html;
+        }
+
+        function generateBracketFromRanking() {
+            buildHorizontalBracket(globalRankings.map(r => r.name));
+            document.getElementById('tableauSection').style.display = 'block';
+            document.getElementById('tableauSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function buildHorizontalBracket(competitors) {
+            let power = 1;
+            while (power < competitors.length) power *= 2;
+            let fullCompetitors = [...competitors];
+            while (fullCompetitors.length < power) {
+                fullCompetitors.push("Exempt (Bye)");
+            }
+
+            let roundNames = [];
+            if (power === 2) roundNames = ["Finale"];
+            else if (power === 4) roundNames = ["Demi-finales", "Finale"];
+            else if (power === 8) roundNames = ["Quarts de finale", "Demi-finales", "Finale"];
+            else if (power === 16) roundNames = ["Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
+            else roundNames = ["Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
+
+            let currentRoundFighters = [];
+            let half = fullCompetitors.length / 2;
+            for (let i = 0; i < half; i++) {
+                currentRoundFighters.push({ p1: fullCompetitors[i], p2: fullCompetitors[fullCompetitors.length - 1 - i], winner: null });
+            }
+
+            window.bracketRounds = [currentRoundFighters];
+            renderHorizontalBracketUI(roundNames);
+        }
+
+        function renderHorizontalBracketUI(roundNames) {
+            let container = document.getElementById('tableauContainer');
+            container.innerHTML = '';
+
+            window.bracketRounds.forEach((round, rIndex) => {
+                let roundColumn = document.createElement('div');
+                roundColumn.className = 'bracket-round-column';
+
+                let title = document.createElement('div');
+                title.className = 'bracket-round-header';
+                title.innerText = roundNames[rIndex] || ('Tour ' + (rIndex + 1));
+                roundColumn.appendChild(title);
+
+                round.forEach((match, mIndex) => {
+                    let matchCard = document.createElement('div');
+                    matchCard.className = 'bracket-match-card';
+
+                    let p1Class = match.winner === match.p1 ? 'bracket-fighter-row winner' : 'bracket-fighter-row';
+                    let p2Class = match.winner === match.p2 ? 'bracket-fighter-row winner' : 'bracket-fighter-row';
+
+                    if (match.p2 === "Exempt (Bye)" && !match.winner) {
+                        match.winner = match.p1;
+                        p1Class = 'bracket-fighter-row winner';
+                    } else if (match.p1 === "Exempt (Bye)" && !match.winner) {
+                        match.winner = match.p2;
+                        p2Class = 'bracket-fighter-row winner';
+                    }
+
+                    matchCard.innerHTML = `
+                        <div class="${p1Class}" onclick="selectHorizontalWinner(${rIndex}, ${mIndex}, '${match.p1.replace(/'/g, "\\'")}')">${match.p1}</div>
+                        <div class="${p2Class}" onclick="selectHorizontalWinner(${rIndex}, ${mIndex}, '${match.p2.replace(/'/g, "\\'")}')">${match.p2}</div>
+                    `;
+                    roundColumn.appendChild(matchCard);
+                });
+
+                container.appendChild(roundColumn);
+            });
+        }
+
+        function selectHorizontalWinner(rIndex, mIndex, fighterName) {
+            if (fighterName === "Exempt (Bye)") return;
+            let match = window.bracketRounds[rIndex][mIndex];
+            match.winner = fighterName;
+
+            let nextRIndex = rIndex + 1;
+            if (nextRIndex < window.bracketRounds.length) {
+                let nextMIndex = Math.floor(mIndex / 2);
+                let nextMatch = window.bracketRounds[nextRIndex][nextMIndex];
+                if (mIndex % 2 === 0) {
+                    nextMatch.p1 = fighterName;
+                } else {
+                    nextMatch.p2 = fighterName;
+                }
+                nextMatch.winner = null; 
+            } else {
+                let prevRound = window.bracketRounds[window.bracketRounds.length - 1];
+                if (prevRound.every(m => m.winner !== null)) {
+                    let nextRoundFighters = [];
+                    for (let i = 0; i < prevRound.length; i += 2) {
+                        if (i + 1 < prevRound.length) {
+                            nextRoundFighters.push({ p1: prevRound[i].winner, p2: prevRound[i+1].winner, winner: null });
+                        }
+                    }
+                    if (nextRoundFighters.length > 0) {
+                        window.bracketRounds.push(nextRoundFighters);
+                    }
+                }
+            }
+
+            let roundNames = ["Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
+            renderHorizontalBracketUI(roundNames);
+        }
+
+        function modifyScore(type, delta) {
+            let el = document.getElementById('score' + type);
+            let val = parseInt(el.innerText) + delta;
+            if(val >= 0) el.innerText = val;
+        }
+        function resetScores() {
+            document.getElementById('scoreR').innerText = '0';
+            document.getElementById('scoreV').innerText = '0';
+        }
+        function startTimer() {}
+        function stopTimer() {}
+        function resetTimer() {}
+    </script>
+</body>
+</html>
