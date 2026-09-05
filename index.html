@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="apple-touch-icon" href="logo-fencing.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Les tournois du CENLP 🤺</title>
@@ -136,6 +135,10 @@
             transform: scale(0.99); 
             opacity: 0.9;
         }
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2) !important;
+        }
 
         .config-row {
             display: flex;
@@ -153,7 +156,6 @@
             margin-bottom: 0 !important;
         }
 
-        /* Grille de poule épurée */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -221,7 +223,6 @@
             color: var(--primary);
         }
 
-        /* Tableau final horizontal */
         .bracket-horizontal-scroll-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -300,7 +301,6 @@
             text-align: center;
         }
 
-        /* Classement général avant tableau */
         .general-ranking-box {
             background: #f8fafc;
             border: 1px solid var(--border);
@@ -328,7 +328,6 @@
             font-weight: 600;
         }
 
-        /* Chrono & Score épurés */
         .timer-panel {
             background: #ffffff;
             border: 1px solid var(--border);
@@ -431,6 +430,53 @@
             transition: opacity 0.2s;
         }
         .score-btns button:active { opacity: 0.85; }
+
+        .cards-panel {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .cards-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .card-btn {
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: white;
+        }
+        .btn-yellow { background: #eab308; color: #1e293b; }
+        .btn-red { background: #dc2626; }
+        .btn-black { background: #0f172a; }
+
+        .cards-indicators {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            min-height: 24px;
+        }
+        .card-light {
+            width: 16px;
+            height: 22px;
+            border-radius: 3px;
+            opacity: 0.2;
+            box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        .card-light.yellow-on { background: #eab308; opacity: 1; box-shadow: 0 0 8px #eab308; }
+        .card-light.red-on { background: #dc2626; opacity: 1; box-shadow: 0 0 8px #dc2626; }
+        .card-light.black-on { background: #0f172a; opacity: 1; box-shadow: 0 0 8px #0f172a; border: 1px solid #64748b; }
         
         ul#fightersList {
             list-style: none;
@@ -456,8 +502,8 @@
     <header>Les tournois du CENLP 🤺</header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tournoi')">Tournoi</button>
-        <button class="tab-btn" onclick="switchTab('chrono')">Chrono & Scores</button>
+        <button class="tab-btn active" id="tabBtn-tournoi" onclick="switchTab('tournoi')">Tournoi</button>
+        <button class="tab-btn" id="tabBtn-chrono" onclick="switchTab('chrono')">Chrono & Scores</button>
     </div>
 
     <div class="content">
@@ -470,9 +516,10 @@
                     <input type="number" id="maxPerPool" value="7" min="3" max="15">
                 </div>
                 <input type="text" id="fighterName" placeholder="Nom du tireur" onkeypress="checkEnter(event)">
-                <button class="btn" onclick="addFighter()">Ajouter</button>
+                <button class="btn" id="btnAddFighter" onclick="addFighter()">Ajouter</button>
                 <ul id="fightersList"></ul>
                 <button class="btn" style="margin-top:14px;" onclick="generatePools()">Générer les poules</button>
+                <button class="btn btn-danger" style="margin-top:10px;" onclick="resetAllTournament()">Réinitialiser tout le tournoi</button>
             </div>
 
             <div class="card" id="poolsSection" style="display:none;">
@@ -488,7 +535,7 @@
             </div>
 
             <div class="card" id="tableauSection" style="display:none;">
-                <h2>4. Tableau d'élimination directe</h2>
+                <h2>4. Tableau d'élimination directe (Règles officielles)</h2>
                 <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 12px;">Défilement horizontal disponible. Cliquez sur le vainqueur pour le faire progresser.</p>
                 <div class="bracket-horizontal-scroll-wrapper">
                     <div class="bracket-horizontal-flex" id="tableauContainer"></div>
@@ -516,8 +563,9 @@
                 </div>
             </div>
 
-            <!-- ENCART SCORES -->
+            <!-- ENCART SCORES & CARTONS -->
             <div class="scoreboards">
+                <!-- ROUGE -->
                 <div class="score-box">
                     <input type="text" id="nameR" value="Rouge" style="text-align:center; font-weight:600; margin-bottom:8px;">
                     <div class="score-val" id="scoreR">0</div>
@@ -525,7 +573,22 @@
                         <button onclick="modifyScore('R', -1)">-</button>
                         <button onclick="modifyScore('R', 1)">+</button>
                     </div>
+                    <!-- Cartons Rouge -->
+                    <div class="cards-panel">
+                        <div class="cards-indicators" id="lightsR">
+                            <div class="card-light" id="lightR_yellow" title="Carton Jaune"></div>
+                            <div class="cards-red-group" id="redsContainerR" style="display:flex; gap:4px;"></div>
+                            <div class="card-light" id="lightR_black" title="Carton Noir"></div>
+                        </div>
+                        <div class="cards-row">
+                            <button class="card-btn btn-yellow" onclick="giveCard('R', 'yellow')">Jaune</button>
+                            <button class="card-btn btn-red" onclick="giveCard('R', 'red')">Rouge</button>
+                            <button class="card-btn btn-black" onclick="giveCard('R', 'black')">Noir</button>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- VERT -->
                 <div class="score-box">
                     <input type="text" id="nameV" value="Vert" style="text-align:center; font-weight:600; margin-bottom:8px;">
                     <div class="score-val" id="scoreV">0</div>
@@ -533,9 +596,26 @@
                         <button onclick="modifyScore('V', -1)">-</button>
                         <button onclick="modifyScore('V', 1)">+</button>
                     </div>
+                    <!-- Cartons Vert -->
+                    <div class="cards-panel">
+                        <div class="cards-indicators" id="lightsV">
+                            <div class="card-light" id="lightV_yellow" title="Carton Jaune"></div>
+                            <div class="cards-red-group" id="redsContainerV" style="display:flex; gap:4px;"></div>
+                            <div class="card-light" id="lightV_black" title="Carton Noir"></div>
+                        </div>
+                        <div class="cards-row">
+                            <button class="card-btn btn-yellow" onclick="giveCard('V', 'yellow')">Jaune</button>
+                            <button class="card-btn btn-red" onclick="giveCard('V', 'red')">Rouge</button>
+                            <button class="card-btn btn-black" onclick="giveCard('V', 'black')">Noir</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button class="btn" style="background:#64748b; margin-top:16px;" onclick="resetScores()">Remettre les scores à zéro</button>
+
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+                <button class="btn" style="background:#eab308; color:#1e293b; flex:1;" onclick="doubleTouch()">Touche Double (+1 / +1)</button>
+                <button class="btn" style="background:#64748b; flex:1;" onclick="resetScoresAndCards()">Remettre scores & cartons à zéro</button>
+            </div>
         </div>
     </div>
 
@@ -544,7 +624,7 @@
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            document.getElementById('tabBtn-' + tabId).classList.add('active');
         }
 
         let fighters = [];
@@ -573,6 +653,18 @@
         function removeFighter(index) {
             fighters.splice(index, 1);
             updateFightersList();
+        }
+
+        function resetAllTournament() {
+            if(confirm("Voulez-vous vraiment réinitialiser tout le tournoi et effacer les listes ?")) {
+                fighters = [];
+                pools = [];
+                globalRankings = [];
+                updateFightersList();
+                document.getElementById('poolsSection').style.display = 'none';
+                document.getElementById('rankingSection').style.display = 'none';
+                document.getElementById('tableauSection').style.display = 'none';
+            }
         }
 
         function generatePools() {
@@ -783,39 +875,83 @@
         }
 
         function generateBracketFromRanking() {
-            buildHorizontalBracket(globalRankings.map(r => r.name));
+            buildFencingBracket(globalRankings.map(r => r.name));
             document.getElementById('tableauSection').style.display = 'block';
             document.getElementById('tableauSection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function buildHorizontalBracket(competitors) {
+        function getStandardFencingSeedOrder(size) {
+            let order = [1, 2];
+            while (order.length < size) {
+                let nextOrder = [];
+                let sum = order.length * 2 + 1;
+                for (let seed of order) {
+                    nextOrder.push(seed);
+                    nextOrder.push(sum - seed);
+                }
+                order = nextOrder;
+            }
+            return order;
+        }
+
+        function buildFencingBracket(competitors) {
             let power = 1;
             while (power < competitors.length) power *= 2;
-            let fullCompetitors = [...competitors];
-            while (fullCompetitors.length < power) {
-                fullCompetitors.push("Exempt (Bye)");
+            
+            let fullCompetitors = [];
+            let seedOrder = getStandardFencingSeedOrder(power);
+
+            for (let i = 0; i < power; i++) {
+                let seedIndex = seedOrder[i] - 1;
+                if (seedIndex < competitors.length) {
+                    fullCompetitors.push(competitors[seedIndex]);
+                } else {
+                    fullCompetitors.push("Exempt (Bye)");
+                }
             }
 
-            let roundNames = [];
-            if (power === 2) roundNames = ["Finale"];
-            else if (power === 4) roundNames = ["Demi-finales", "Finale"];
-            else if (power === 8) roundNames = ["Quarts de finale", "Demi-finales", "Finale"];
-            else if (power === 16) roundNames = ["Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
-            else roundNames = ["Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
+            let allRoundNames = [];
+            if (power === 2) allRoundNames = ["Finale"];
+            else if (power === 4) allRoundNames = ["Demi-finales", "Finale"];
+            else if (power === 8) allRoundNames = ["Quarts de finale", "Demi-finales", "Finale"];
+            else if (power === 16) allRoundNames = ["Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
+            else if (power === 32) allRoundNames = ["Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
+            else allRoundNames = ["Tableau de 64", "Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
 
             let currentRoundFighters = [];
             let half = fullCompetitors.length / 2;
             for (let i = 0; i < half; i++) {
-                currentRoundFighters.push({ p1: fullCompetitors[i], p2: fullCompetitors[fullCompetitors.length - 1 - i], winner: null });
+                currentRoundFighters.push({ 
+                    p1: fullCompetitors[i * 2], 
+                    p2: fullCompetitors[i * 2 + 1], 
+                    winner: null 
+                });
             }
 
             window.bracketRounds = [currentRoundFighters];
-            renderHorizontalBracketUI(roundNames);
+            
+            // CORRECTION RADICALE : On nomme TOUJOURS chaque colonne du tableau en fonction du nombre de matchs qu'elle contient (comme demandé : "Le système doit nommer la phase du tableau en fonction du nombre de match").
+            // 1 match = Finale, 2 matchs = Demi-finales, 4 matchs = Quarts de finale, 8 matchs = Huitièmes de finale, etc.
+            window.bracketRoundsDynamicNames = function() {
+                return window.bracketRounds.map(round => {
+                    let numMatches = round.length;
+                    if (numMatches === 1) return "Finale";
+                    if (numMatches === 2) return "Demi-finales";
+                    if (numMatches === 4) return "Quarts de finale";
+                    if (numMatches === 8) return "Huitièmes de finale";
+                    if (numMatches === 16) return "Seizièmes de finale";
+                    return `Tableau de ${numMatches * 2}`;
+                });
+            };
+
+            renderHorizontalBracketUI();
         }
 
-        function renderHorizontalBracketUI(roundNames) {
+        function renderHorizontalBracketUI() {
             let container = document.getElementById('tableauContainer');
             container.innerHTML = '';
+
+            let roundNames = window.bracketRoundsDynamicNames();
 
             window.bracketRounds.forEach((round, rIndex) => {
                 let roundBox = document.createElement('div');
@@ -823,7 +959,7 @@
 
                 let title = document.createElement('div');
                 title.className = 'bracket-round-box-title';
-                title.innerText = roundNames[rIndex] || ('Tour ' + (rIndex + 1));
+                title.innerText = roundNames[rIndex];
                 roundBox.appendChild(title);
 
                 round.forEach((match, mIndex) => {
@@ -841,10 +977,13 @@
                         p2Class = 'bracket-fighter-btn winner';
                     }
 
+                    let safeP1 = match.p1.replace(/'/g, "\\'");
+                    let safeP2 = match.p2.replace(/'/g, "\\'");
+
                     matchBlock.innerHTML = `
-                        <div class="${p1Class}" onclick="selectHorizontalWinner(${rIndex}, ${mIndex}, '${match.p1.replace(/'/g, "\\'")}')">${match.p1}</div>
+                        <div class="${p1Class}" onclick="selectHorizontalWinner(${rIndex}, ${mIndex}, '${safeP1}')">${match.p1}</div>
                         <div class="bracket-match-vs">vs</div>
-                        <div class="${p2Class}" onclick="selectHorizontalWinner(${rIndex}, ${mIndex}, '${match.p2.replace(/'/g, "\\'")}')">${match.p2}</div>
+                        <div class="${p2Class}" onclick="selectHorizontalWinner(${rIndex}, ${mIndex}, '${safeP2}')">${match.p2}</div>
                     `;
                     roundBox.appendChild(matchBlock);
                 });
@@ -883,11 +1022,9 @@
                 }
             }
 
-            let roundNames = ["Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
-            renderHorizontalBracketUI(roundNames);
+            renderHorizontalBracketUI();
         }
 
-        /* --- LOGIQUE CHRONOMÈTRE FIABLE --- */
         let timerInterval = null;
         let remainingSeconds = 180;
         let isRunning = false;
@@ -942,9 +1079,65 @@
             if(val >= 0) el.innerText = val;
         }
 
-        function resetScores() {
+        function doubleTouch() {
+            modifyScore('R', 1);
+            modifyScore('V', 1);
+        }
+
+        let matchCards = {
+            R: { yellow: false, reds: 0, black: false },
+            V: { yellow: false, reds: 0, black: false }
+        };
+
+        function giveCard(side, color) {
+            let data = matchCards[side];
+            if (color === 'yellow') {
+                if (!data.yellow) {
+                    data.yellow = true;
+                } else {
+                    data.reds++;
+                    modifyScore(side, 1);
+                }
+            } else if (color === 'red') {
+                data.reds++;
+                modifyScore(side, 1);
+            } else if (color === 'black') {
+                data.black = true;
+                let fighterName = side === 'R' ? document.getElementById('nameR').value : document.getElementById('nameV').value;
+                alert(`Carton noir pour ${fighterName} ! Fin immédiate du match/compétition.`);
+            }
+            updateCardsUI(side);
+        }
+
+        function updateCardsUI(side) {
+            let data = matchCards[side];
+            let yellowLight = document.getElementById(`light${side}_yellow`);
+            let redsContainer = document.getElementById(`redsContainer${side}`);
+            let blackLight = document.getElementById(`light${side}_black`);
+
+            if (data.yellow) yellowLight.className = "card-light yellow-on";
+            else yellowLight.className = "card-light";
+
+            redsContainer.innerHTML = '';
+            for (let i = 0; i < data.reds; i++) {
+                let redDiv = document.createElement('div');
+                redDiv.className = "card-light red-on";
+                redsContainer.appendChild(redDiv);
+            }
+
+            if (data.black) blackLight.className = "card-light black-on";
+            else blackLight.className = "card-light";
+        }
+
+        function resetScoresAndCards() {
             document.getElementById('scoreR').innerText = '0';
             document.getElementById('scoreV').innerText = '0';
+            matchCards = {
+                R: { yellow: false, reds: 0, black: false },
+                V: { yellow: false, reds: 0, black: false }
+            };
+            updateCardsUI('R');
+            updateCardsUI('V');
         }
     </script>
 </body>
