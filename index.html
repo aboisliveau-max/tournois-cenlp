@@ -433,50 +433,64 @@
 
         .cards-panel {
             margin-top: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
             background: #ffffff;
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 10px;
-        }
-        .cards-row {
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .cards-main-row {
+            display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        .cards-buttons-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
         .card-btn {
             border: none;
-            border-radius: 6px;
-            padding: 6px 10px;
+            border-radius: 5px;
+            padding: 5px 8px;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             color: white;
+            white-space: nowrap;
         }
         .btn-yellow { background: #eab308; color: #1e293b; }
         .btn-red { background: #dc2626; }
         .btn-black { background: #0f172a; }
 
-        .cards-indicators {
+        .cards-indicators-col {
             display: flex;
-            gap: 6px;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 24px;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+        }
+        .cards-red-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: center;
         }
         .card-light {
-            width: 16px;
-            height: 22px;
-            border-radius: 3px;
+            width: 14px;
+            height: 18px;
+            border-radius: 2px;
             opacity: 0.2;
             box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
         }
-        .card-light.yellow-on { background: #eab308; opacity: 1; box-shadow: 0 0 8px #eab308; }
-        .card-light.red-on { background: #dc2626; opacity: 1; box-shadow: 0 0 8px #dc2626; }
-        .card-light.black-on { background: #0f172a; opacity: 1; box-shadow: 0 0 8px #0f172a; border: 1px solid #64748b; }
+        .card-light.yellow-on { background: #eab308; opacity: 1; box-shadow: 0 0 6px #eab308; }
+        .card-light.red-on { background: #dc2626; opacity: 1; box-shadow: 0 0 6px #dc2626; }
+        .card-light.black-on { background: #0f172a; opacity: 1; box-shadow: 0 0 6px #0f172a; border: 1px solid #64748b; }
         
         ul#fightersList {
             list-style: none;
@@ -573,17 +587,19 @@
                         <button onclick="modifyScore('R', -1)">-</button>
                         <button onclick="modifyScore('R', 1)">+</button>
                     </div>
-                    <!-- Cartons Rouge -->
+                    <!-- Cartons Rouge : Boutons à gauche, indicateurs sur la partie libérée à droite -->
                     <div class="cards-panel">
-                        <div class="cards-indicators" id="lightsR">
-                            <div class="card-light" id="lightR_yellow" title="Carton Jaune"></div>
-                            <div class="cards-red-group" id="redsContainerR" style="display:flex; gap:4px;"></div>
-                            <div class="card-light" id="lightR_black" title="Carton Noir"></div>
-                        </div>
-                        <div class="cards-row">
-                            <button class="card-btn btn-yellow" onclick="giveCard('R', 'yellow')">Jaune</button>
-                            <button class="card-btn btn-red" onclick="giveCard('R', 'red')">Rouge</button>
-                            <button class="card-btn btn-black" onclick="giveCard('R', 'black')">Noir</button>
+                        <div class="cards-main-row">
+                            <div class="cards-buttons-col" style="align-items: flex-start;">
+                                <button class="card-btn btn-yellow" onclick="giveCard('R', 'yellow')">Jaune</button>
+                                <button class="card-btn btn-red" onclick="giveCard('R', 'red')">Rouge</button>
+                                <button class="card-btn btn-black" onclick="giveCard('R', 'black')">Noir</button>
+                            </div>
+                            <div class="cards-indicators-col" id="lightsR">
+                                <div class="card-light" id="lightR_yellow" title="Carton Jaune"></div>
+                                <div class="cards-red-group-vertical" id="redsContainerR"></div>
+                                <div class="card-light" id="lightR_black" title="Carton Noir"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -596,17 +612,19 @@
                         <button onclick="modifyScore('V', -1)">-</button>
                         <button onclick="modifyScore('V', 1)">+</button>
                     </div>
-                    <!-- Cartons Vert -->
+                    <!-- Cartons Vert : Indicateurs à gauche sur la partie libérée, boutons à droite -->
                     <div class="cards-panel">
-                        <div class="cards-indicators" id="lightsV">
-                            <div class="card-light" id="lightV_yellow" title="Carton Jaune"></div>
-                            <div class="cards-red-group" id="redsContainerV" style="display:flex; gap:4px;"></div>
-                            <div class="card-light" id="lightV_black" title="Carton Noir"></div>
-                        </div>
-                        <div class="cards-row">
-                            <button class="card-btn btn-yellow" onclick="giveCard('V', 'yellow')">Jaune</button>
-                            <button class="card-btn btn-red" onclick="giveCard('V', 'red')">Rouge</button>
-                            <button class="card-btn btn-black" onclick="giveCard('V', 'black')">Noir</button>
+                        <div class="cards-main-row">
+                            <div class="cards-indicators-col" id="lightsV">
+                                <div class="card-light" id="lightV_yellow" title="Carton Jaune"></div>
+                                <div class="cards-red-group-vertical" id="redsContainerV"></div>
+                                <div class="card-light" id="lightV_black" title="Carton Noir"></div>
+                            </div>
+                            <div class="cards-buttons-col" style="align-items: flex-end;">
+                                <button class="card-btn btn-yellow" onclick="giveCard('V', 'yellow')">Jaune</button>
+                                <button class="card-btn btn-red" onclick="giveCard('V', 'red')">Rouge</button>
+                                <button class="card-btn btn-black" onclick="giveCard('V', 'black')">Noir</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -910,14 +928,6 @@
                 }
             }
 
-            let allRoundNames = [];
-            if (power === 2) allRoundNames = ["Finale"];
-            else if (power === 4) allRoundNames = ["Demi-finales", "Finale"];
-            else if (power === 8) allRoundNames = ["Quarts de finale", "Demi-finales", "Finale"];
-            else if (power === 16) allRoundNames = ["Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
-            else if (power === 32) allRoundNames = ["Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
-            else allRoundNames = ["Tableau de 64", "Seizièmes de finale", "Huitièmes de finale", "Quarts de finale", "Demi-finales", "Finale"];
-
             let currentRoundFighters = [];
             let half = fullCompetitors.length / 2;
             for (let i = 0; i < half; i++) {
@@ -930,8 +940,6 @@
 
             window.bracketRounds = [currentRoundFighters];
             
-            // CORRECTION RADICALE : On nomme TOUJOURS chaque colonne du tableau en fonction du nombre de matchs qu'elle contient (comme demandé : "Le système doit nommer la phase du tableau en fonction du nombre de match").
-            // 1 match = Finale, 2 matchs = Demi-finales, 4 matchs = Quarts de finale, 8 matchs = Huitièmes de finale, etc.
             window.bracketRoundsDynamicNames = function() {
                 return window.bracketRounds.map(round => {
                     let numMatches = round.length;
